@@ -18,7 +18,8 @@ if ispc
     % a bug in Matlab).
     
     setenv('LD_LIBRARY_PATH', '');
-    name = tempname;
+    name = strrep(tempname,' ','_');   % Windows user names with spaces give problems
+    
  
 	in = cell(1, nargin - 1);
 
