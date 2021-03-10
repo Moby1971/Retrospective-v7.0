@@ -9,8 +9,6 @@ if nc > 1
     % Take the principal component of the data
     [coeff,~,~] = pca(data);
     dataPCA = data*coeff;
-    
-    % Take the principal component of the data
     nav_amplitude = dataPCA(:,1);
   
 else
