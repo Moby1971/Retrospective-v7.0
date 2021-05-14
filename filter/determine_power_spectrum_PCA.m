@@ -1,4 +1,4 @@
-function [detectedHR,detectedRR,powerspectrum,f] = determine_power_spectrum_PCA(nav_input,nc,TR,dimy,includewindow,excludewindow)
+function [detectedHR,detectedRR,powerspectrum,f] = determine_power_spectrum_PCA(nav_input,nc,TR,dimy,includewindow,excludewindow,filtersettings)
 
 if nc > 1
     
@@ -41,16 +41,16 @@ power = movmean(power,3);   % smooth the power spectrum with moving average
 powerspectrum = power;
 
 % detect heart rate
-minheartbpm = 350;
-maxheartbpm = 600;
+minheartbpm = filtersettings(1);
+maxheartbpm = filtersettings(2);
 minidx = round(minheartbpm*n/(fs*60));
 maxidx = round(maxheartbpm*n/(fs*60));
 [~, idx] = max(power(minidx:maxidx));
 detectedHR = round(idx*fs*60/n + minheartbpm);
 
 % detect respiratory rate
-minRRbpm = 30;
-maxRRbpm = 70;
+minRRbpm = filtersettings(3);
+maxRRbpm = filtersettings(4);
 minidx = round(minRRbpm*n/(fs*60));
 maxidx = round(maxRRbpm*n/(fs*60));
 [~, idx] = max(power(minidx:maxidx));

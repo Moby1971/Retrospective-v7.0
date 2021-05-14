@@ -1,4 +1,4 @@
-function [heart_outputdata,resp_outputdata,pc_outputdata] = filter_nav_PCA(app,inputdata,ncoils,TR,hr,bwhr,rr,bwrr,order)   
+function [heart_outputdata,resp_outputdata,pc_outputdata] = filter_nav_PCA(app,inputdata,ncoils,TR,hr,bwhr,rr,bwrr,filtersettings)   
 
 % applies a bandwidth filter on the navigator data
 % TR = repetition time TR in ms
@@ -9,6 +9,8 @@ function [heart_outputdata,resp_outputdata,pc_outputdata] = filter_nav_PCA(app,i
 sf=1000/TR;     % sampling frequency in Hz = 1/TR[ms]
 
 resp_harmonics = 2;   % number of higher order harmonics for respiratory frequency, 2 = main + 1 harmonic
+
+order = filtersettings(5); % butterworth filter order
 
 if ncoils > 1
     
