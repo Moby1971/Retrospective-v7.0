@@ -38,11 +38,11 @@ amplitude(1,:) = detrend(amplitude(1,:));
 % Make a guess whether the respiration peaks are positive or negative
 nr_elements = length(amplitude);
 first_element = round(0.4*nr_elements);
-last_element = round(0.6*nr_elements);
-max_amplitude = abs(max(amplitude(1,first_element:last_element)));
-min_amplitude = abs(min(amplitude(1,first_element:last_element)));
+last_element = round(0.8*nr_elements);
+max_amplitude = abs(max(detrend(amplitude(1,first_element:last_element))));
+min_amplitude = abs(min(detrend(amplitude(1,first_element:last_element))));
 if min_amplitude > max_amplitude
-   amplitude = -amplitude; 
+   amplitude(1,:) = -amplitude(1,:); 
 end
 
 

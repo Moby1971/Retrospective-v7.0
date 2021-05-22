@@ -36,21 +36,34 @@ amplitude(1,:) = detrend(amplitude(1,:));
 
 % Make a guess whether the respiration peaks are positive or negative in the different slices
 % This will not be needed with out-of-slice navigator
+
 nr_elements = length(amplitude);
 nr_elementsperslice = round(nr_elements/dimz);
+
 for i = 1:dimz
+
+    % First and last navigator point for each slice
     first_element = (i-1)*nr_elementsperslice + 1;
     last_element = i*nr_elementsperslice;
+    
+    % Only look at part of that data away from the start to prevent transient effects
     first_element1 = (i-1)*nr_elementsperslice + 1 + round(0.4*nr_elementsperslice);
-    last_element1 = i*nr_elementsperslice - round(0.4*nr_elementsperslice);
-    max_amplitude = abs(max(amplitude(1,first_element1:last_element1)));
-    min_amplitude = abs(min(amplitude(1,first_element1:last_element1)));
+    last_element1 = i*nr_elementsperslice - round(0.1*nr_elementsperslice);
+ 
+    % Min/max of navigator
+    max_amplitude = abs(max(detrend(amplitude(1,first_element1:last_element1))));
+    min_amplitude = abs(min(detrend(amplitude(1,first_element1:last_element1))));
+
     if min_amplitude > max_amplitude
         amplitude(1,first_element:last_element) = -amplitude(1,first_element:last_element); 
     end
+    
+    amplitude(1,first_element:last_element) = detrend(amplitude(1,first_element:last_element));
+    
 end
 
-% Multiple with +1 or -1 depending on switch
+
+% Multiple with +1 or -1 depending on global switch
 amplitude = amplitude*posneg;
 
 
