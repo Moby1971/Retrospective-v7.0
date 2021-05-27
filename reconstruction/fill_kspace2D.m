@@ -30,8 +30,8 @@ unsorted_kspace = reshape(raw,[1,size(raw),1]);
 totalk = nr_reps * nr_ksteps * dimz;
 dyn_bin_ass = round(linspace(0.5, nr_dynamics+0.49, totalk));       % list of increasing integer number 1 .. nr_dynamics evenly spaced over the entire acquistion time
 
-
 cnt = 0;
+
 
 for slice=1:dimz                    % loop over slices
     

@@ -31,6 +31,8 @@ else
     
 end
 
+
+
 % Filter for heart motion
 hrf=hr/60;      % expected heartrate in Hz = hr[bpm]/60
 bwh=bwhr/60;    % bandwidth heartrate in Hz = [bpm]/60
@@ -44,6 +46,7 @@ heart_outputdata = detrend(heart_outputdata);
 factor = round(5000/app.HeartEditField.Value);  % adapt the envelope setting to match the expected heart rate frequency
 [env,~] = envelope(heart_outputdata,factor,'peak');
 heart_outputdata = heart_outputdata./abs(env);
+
             
 % Filter for respiration motion
 while true
@@ -72,6 +75,8 @@ while true
     drawnow;
     
 end
+
+
 
 % detrend and normalize envelope
 resp_outputdata = detrend(resp_outputdata);

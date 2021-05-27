@@ -39,22 +39,22 @@ for l = 1:dimd
     end
 end
 
-% Bart dimensions
-% 	READ_DIM,       1   z  
-% 	PHS1_DIM,       2   y  
-% 	PHS2_DIM,       3   x  
-% 	COIL_DIM,       4   coils
-% 	MAPS_DIM,       5   sense maps
-% 	TE_DIM,         6
-% 	COEFF_DIM,      7
-% 	COEFF2_DIM,     8
-% 	ITER_DIM,       9
-% 	CSHIFT_DIM,     10
-% 	TIME_DIM,       11  cardiac / respiratory CINE
-% 	TIME2_DIM,      12  dynamics
-% 	LEVEL_DIM,      13
-% 	SLICE_DIM,      14  slices
-% 	AVG_DIM,        15
+% Bart dimensions  Bart   Matlab
+% 	READ_DIM,       0       1   z  
+% 	PHS1_DIM,       1       2   y  
+% 	PHS2_DIM,       2       3   x  
+% 	COIL_DIM,       3       4   coils
+% 	MAPS_DIM,       4       5   sense maps
+% 	TE_DIM,         5       6
+% 	COEFF_DIM,      6       7
+% 	COEFF2_DIM,     7       8
+% 	ITER_DIM,       8       9
+% 	CSHIFT_DIM,     9       10
+% 	TIME_DIM,       10      11  cardiac / respiratory CINE
+% 	TIME2_DIM,      11      12  dynamics
+% 	LEVEL_DIM,      12      13
+% 	SLICE_DIM,      13      14  slices
+% 	AVG_DIM,        14      15
 
 kspace_pics = permute(kspace,[7,3,2,6,8,9,10,11,12,13,1,5,14,4]);
 
