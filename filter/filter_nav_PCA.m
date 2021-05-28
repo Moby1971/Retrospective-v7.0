@@ -56,10 +56,16 @@ while true
     
     resp_outputdata = zeros(size(nav_amplitude));
     
-    for i = 1:resp_harmonics
-        [b, a] = butter(order,[i*rrf-0.5*bwr,i*rrf+0.5*bwr]/(sf/2),'bandpass');           % butterworth bandpass filter
-        resp_outputdata = resp_outputdata + (1/i^2)*filtfilt(b,a,nav_amplitude);          % apply zero-phase shift filtering
+    if rr<45
+        [b, a] = butter(order,(rrf+0.5*bwr)/(sf/2),'low');           % butterworth lowpass filter for low frequencies
+        resp_outputdata = filtfilt(b,a,nav_amplitude);
+    else
+        for i = 1:resp_harmonics
+            [b, a] = butter(order,[i*rrf-0.5*bwr,i*rrf+0.5*bwr]/(sf/2),'bandpass');           % butterworth bandpass filter
+            resp_outputdata = resp_outputdata + (1/i^2)*filtfilt(b,a,nav_amplitude);          % apply zero-phase shift filtering
+        end
     end
+    
       
     % In some cases the filter produces NaN when filtering with too low
     % frequency. In those cases the respirate and bandwidth will be
@@ -77,9 +83,9 @@ while true
 end
 
 
-
 % detrend and normalize envelope
 resp_outputdata = detrend(resp_outputdata);
+
 
 % normalize envelope
 factor = round(5000/app.RespirationEditField.Value);  % adapt the envelope setting to match the expected heart rate frequency

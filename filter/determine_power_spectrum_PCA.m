@@ -56,4 +56,5 @@ maxidx = round(maxRRbpm*n/(fs*60));
 [~, idx] = max(power(minidx:maxidx));
 detectedRR = round(idx*fs*60/n + minRRbpm);
 
+
 end
