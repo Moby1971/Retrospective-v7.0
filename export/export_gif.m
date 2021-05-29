@@ -1,4 +1,4 @@
-function export_gif(gifexportpath,movie,tag,window,level)
+function export_gif(gifexportpath,movie,tag,window,level,recotype,acqdur)
 % exports movie to animated gif
 
 
@@ -10,8 +10,7 @@ folder_name = [gifexportpath,[filesep,'CINE_GIFS_',num2str(number_of_frames),'_'
 if (~exist(folder_name, 'dir')); mkdir(folder_name); end
 delete([folder_name,filesep,'*']);
 
-% one heartbeat is 1 second in the movie
-delay_time = 1/number_of_frames;  
+
 
 % scale from 0 to 255
 window = window*255/max(movie(:));
@@ -24,28 +23,78 @@ movie(movie < 0) = 0;
 movie(movie > 255) = 255;
 
 
-for i = 1:number_of_slices
+
+
+if strcmp(recotype,'realtime')
     
-    slice = ['0',num2str(i)];
-    slice = slice(end-1:end);
     
-    for j = 1:number_of_dynamics
+    % dynamic movie
+    
+    delay_time = acqdur/number_of_dynamics;  
+    
+    for i = 1:number_of_slices
         
-        dynamic = ['00',num2str(j)];
-        dynamic = dynamic(end-2:end);
+        slice = ['0',num2str(i)];
+        slice = slice(end-1:end);
         
-        for idx = 1:number_of_frames
+        for j = 1:number_of_frames
             
-            if idx == 1
-                imwrite(uint8(squeeze(movie(idx,:,:,i,j))),[folder_name,filesep,'movie_',tag,'_slice',slice,'_dynamic',dynamic,'.gif'],'DelayTime',delay_time,'LoopCount',inf);
-            else
-                imwrite(uint8(squeeze(movie(idx,:,:,i,j))),[folder_name,filesep,'movie_',tag,'_slice',slice,'_dynamic',dynamic,'.gif'],'WriteMode','append','DelayTime',delay_time);
+            frame = ['00',num2str(j)];
+            frame = frame(end-2:end);
+            
+            for idx = 1:number_of_dynamics
+                
+                if idx == 1
+                    imwrite(uint8(squeeze(movie(j,:,:,i,idx))),[folder_name,filesep,'movie_',tag,'_slice',slice,'frame',frame,'.gif'],'DelayTime',delay_time,'LoopCount',inf);
+                else
+                    imwrite(uint8(squeeze(movie(j,:,:,i,idx))),[folder_name,filesep,'movie_',tag,'_slice',slice,'frame',frame,'.gif'],'WriteMode','append','DelayTime',delay_time);
+                end
+                
             end
             
         end
         
     end
     
+    
+    
+    
+    
+else
+    
+    
+    
+    % frames movie
+    
+    delay_time = 1/number_of_frames;  
+    
+    for i = 1:number_of_slices
+        
+        slice = ['0',num2str(i)];
+        slice = slice(end-1:end);
+        
+        for j = 1:number_of_dynamics
+            
+            frame = ['00',num2str(j)];
+            frame = frame(end-2:end);
+            
+            for idx = 1:number_of_frames
+                
+                if idx == 1
+                    imwrite(uint8(squeeze(movie(idx,:,:,i,j))),[folder_name,filesep,'movie_',tag,'_slice',slice,'_dynamic',frame,'.gif'],'DelayTime',delay_time,'LoopCount',inf);
+                else
+                    imwrite(uint8(squeeze(movie(idx,:,:,i,j))),[folder_name,filesep,'movie_',tag,'_slice',slice,'_dynamic',frame,'.gif'],'WriteMode','append','DelayTime',delay_time);
+                end
+                
+            end
+            
+        end
+        
+    end
+    
+    
 end
+
+
 
 end                 
