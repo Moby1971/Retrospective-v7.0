@@ -1,4 +1,4 @@
-function export_dicom(directory,movie,parameters,heart_rate,acq_dur,tag)
+function export_dicom(directory,movie,parameters,heart_rate,acq_dur,tag,recotype)
 
 
 
@@ -32,7 +32,7 @@ for dyn = 1:nr_dynamics
         
         for frame = 1:nr_frames
             
-            dcm_header = generate_dicomheader(parameters,slice,nr_dynamics,frame,nr_frames,dimz,dimy,dimx,heart_rate,acq_dur,dcmid);
+            dcm_header = generate_dicomheader(parameters,slice,dyn,nr_dynamics,frame,nr_frames,dimz,dimy,dimx,heart_rate,acq_dur,dcmid,recotype);
             fn = ['0000',num2str(cnt)];
             fn = fn(size(fn,2)-4:size(fn,2));
             fname = [folder_name,filesep,'frame_',num2str(frame),'_slice_',num2str(slice),'_dynamic_',num2str(dyn),'_',fn,'.dcm'];
