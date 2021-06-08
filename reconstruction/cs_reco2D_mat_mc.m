@@ -7,6 +7,7 @@ nr_cine = size(kspace_in{1},1);
 nr_slices = size(kspace_in{1},4);
 nr_dynamics = size(kspace_in{1},5);
 
+
 % in case of 1 frame, duplicate that frame to facilitate reconstruction
 if nr_cine == 1
     for i = 1:nc
@@ -14,16 +15,17 @@ if nr_cine == 1
     end
 end
 
+
 % kspace data y,x,t,slices,dynamics
 for i = 1:nc
     kspace_in{i} = permute(kspace_in{i},[2,3,1,4,5]);
 end
 
+
 % kspace data y,x,t,slices,dynamics,coils
 for i = 1:nc
     kspace(:,:,:,:,:,i) = kspace_in{i};
 end
-
 
 
 % averages data y,x,t,slices,dynamics

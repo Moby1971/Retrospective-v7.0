@@ -50,7 +50,7 @@ end
 % 	COEFF2_DIM,     7       8
 % 	ITER_DIM,       8       9
 % 	CSHIFT_DIM,     9       10
-% 	TIME_DIM,       10      11  cardiac / respiratory CINE
+% 	TIME_DIM,       10      11  cardiac / respiratory CINE frames
 % 	TIME2_DIM,      11      12  dynamics
 % 	LEVEL_DIM,      12      13
 % 	SLICE_DIM,      13      14  slices
@@ -98,6 +98,8 @@ else
     
     % Reconstruction without sensitivity correction
     sensitivities = ones(1,dimy,dimx,nc,1,1,1,1,1,1,1,1,1,dimz);
+    
+    disp(size(kspace_pics))
     
     % regular reconstruction
     picscommand = ['pics -RW:6:0:',num2str(Wavelet),' -RT:6:0:',num2str(TVxy),' -RT:1024:0:',num2str(TVt),' -RT:2048:0:',num2str(TVd)];
