@@ -99,8 +99,6 @@ else
     % Reconstruction without sensitivity correction
     sensitivities = ones(1,dimy,dimx,nc,1,1,1,1,1,1,1,1,1,dimz);
     
-    disp(size(kspace_pics))
-    
     % regular reconstruction
     picscommand = ['pics -RW:6:0:',num2str(Wavelet),' -RT:6:0:',num2str(TVxy),' -RT:1024:0:',num2str(TVt),' -RT:2048:0:',num2str(TVd)];
     image_reg = bart(picscommand,kspace_pics,sensitivities);
@@ -112,11 +110,15 @@ end
 
 % rearrange to correct orientation: frames, x, y, slices, dynamics, coils
 if SOS==1
+    
     image_reg = reshape(image_reg,[dimy,dimx,dimc,dimd,dimz]);
     image_out = flip(permute(image_reg,[3,2,1,5,4]),3);
+    
 else
+    
     image_reg = reshape(image_reg,[dimy,dimx,dimc,nc,dimd,dimz]);
     image_out = flip(permute(image_reg,[3,2,1,6,5,4]),3);
+    
 end
 
 % sense map orientations: x, y, slice, map1, map2
