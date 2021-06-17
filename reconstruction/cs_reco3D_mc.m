@@ -1,4 +1,4 @@
-function [image_out,sense_map] = cs_reco3D_mc(app,kspace_in,nc,Wavelet,TVt,TVxyz,TVd,ESPIRiT,CLEAR)
+function [image_out,sense_map] = cs_reco3D_mc(app,kspace_in,nc,Wavelet,TVxyz,LR,TVt,TVd,ESPIRiT,CLEAR)
 
 % app = matlab app
 % kspace_in = sorted k-space
@@ -83,7 +83,22 @@ if ESPIRiT && nc>1
     app.ProgressGauge.Value = 25;
     drawnow;
     
-    picscommand = ['pics -RW:7:0:',num2str(Wavelet),' -RT:7:0:',num2str(TVxyz),' -RT:1024:0:',num2str(TVt),' -RT:2048:0:',num2str(TVd)];
+    picscommand = 'pics -S ';
+    if Wavelet>0
+       picscommand = [picscommand,' -RW:7:0:',num2str(Wavelet)];
+    end
+    if TVxyz>0
+       picscommand = [picscommand,' -RT:7:0:',num2str(TVxyz)];
+    end
+    if LR>0
+       picscommand = [picscommand,' -RL:7:7:',num2str(LR)];
+    end
+    if TVt>0
+       picscommand = [picscommand,' -RT:1024:0:',num2str(TVt)];
+    end
+    if TVd>0
+       picscommand = [picscommand,' -RT:2048:0:',num2str(TVd)];
+    end
     image_reg = bart(picscommand,kspace_pics,sensitivities);
     
     app.ProgressGauge.Value = 95;
@@ -108,7 +123,23 @@ else
     % Reconstruction without sensitivity correction
     sensitivities = ones(dimz,dimy,dimx,nc,1,1,1,1,1,1,1,1,1,1);
     
-    picscommand = ['pics -RW:7:0:',num2str(Wavelet),' -RT:7:0:',num2str(TVxyz),' -RT:1024:0:',num2str(TVt),' -RT:2048:0:',num2str(TVd)];
+    picscommand = 'pics -S ';
+    if Wavelet>0
+       picscommand = [picscommand,' -RW:7:0:',num2str(Wavelet)];
+    end
+    if TVxyz>0
+       picscommand = [picscommand,' -RT:7:0:',num2str(TVxyz)];
+    end
+    if LR>0
+       picscommand = [picscommand,' -RL:7:7:',num2str(LR)];
+    end
+    if TVt>0
+       picscommand = [picscommand,' -RT:1024:0:',num2str(TVt)];
+    end
+    if TVd>0
+       picscommand = [picscommand,' -RT:2048:0:',num2str(TVd)];
+    end
+    
     image_reg = abs(bart(picscommand,kspace_pics,sensitivities));
     
 end

@@ -1,4 +1,4 @@
-function [image_out,sense_map] = cs_reco2D_mc(app,kspace_in,nc,Wavelet,TVt,TVxy,TVd,ESPIRiT,CLEAR,SOS)
+function [image_out,sense_map] = cs_reco2D_mc(app,kspace_in,nc,Wavelet,TVxy,LR,TVt,TVd,ESPIRiT,CLEAR,SOS)
 
 % app = matlab app
 % kspace_in = sorted k-space 
@@ -73,7 +73,22 @@ if ESPIRiT && nc>1
     kspace_pics_sum = sum(kspace_pics,[11,12]);
     sensitivities = bart('ecalib -S -I -a', kspace_pics_sum);      % ecalib with softsense
     
-    picscommand = ['pics -RW:6:0:',num2str(Wavelet),' -RT:6:0:',num2str(TVxy),' -RT:1024:0:',num2str(TVt),' -RT:2048:0:',num2str(TVd)];
+    picscommand = 'pics -S ';
+    if Wavelet>0
+       picscommand = [picscommand,' -RW:6:0:',num2str(Wavelet)];
+    end
+    if TVxy>0
+       picscommand = [picscommand,' -RT:6:0:',num2str(TVxy)];
+    end
+    if LR>0
+       picscommand = [picscommand,' -RL:6:6:',num2str(LR)];
+    end
+    if TVt>0
+       picscommand = [picscommand,' -RT:1024:0:',num2str(TVt)];
+    end
+    if TVd>0
+       picscommand = [picscommand,' -RT:2048:0:',num2str(TVd)];
+    end
     image_reg = bart(picscommand,kspace_pics,sensitivities);
     
     % Sum of squares reconstruction
@@ -100,7 +115,22 @@ else
     sensitivities = ones(1,dimy,dimx,nc,1,1,1,1,1,1,1,1,1,dimz);
     
     % regular reconstruction
-    picscommand = ['pics -RW:6:0:',num2str(Wavelet),' -RT:6:0:',num2str(TVxy),' -RT:1024:0:',num2str(TVt),' -RT:2048:0:',num2str(TVd)];
+    picscommand = 'pics -S ';
+    if Wavelet>0
+       picscommand = [picscommand,' -RW:6:0:',num2str(Wavelet)];
+    end
+    if TVxy>0
+       picscommand = [picscommand,' -RT:6:0:',num2str(TVxy)];
+    end
+    if LR>0
+       picscommand = [picscommand,' -RL:6:6:',num2str(LR)];
+    end
+    if TVt>0
+       picscommand = [picscommand,' -RT:1024:0:',num2str(TVt)];
+    end
+    if TVd>0
+       picscommand = [picscommand,' -RT:2048:0:',num2str(TVd)];
+    end
     image_reg = bart(picscommand,kspace_pics,sensitivities);
     
     % Take absolute values
