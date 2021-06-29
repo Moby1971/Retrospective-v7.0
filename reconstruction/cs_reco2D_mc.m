@@ -1,4 +1,4 @@
-function [image_out,sense_map] = cs_reco2D_mc(app,kspace_in,nc,Wavelet,TVxy,LR,TVt,TVd,ESPIRiT,CLEAR,SOS)
+function [image_out,sense_map] = cs_reco2D_mc(app,kspace_in,nc,Wavelet,TVxy,LR,TVt,TVd,ESPIRiT,CLEAR,SOS,parameters)
 
 % app = matlab app
 % kspace_in = sorted k-space 
@@ -156,5 +156,11 @@ sense_map = flip(permute(abs(sensitivities),[3,2,14,4,5,1,6,7,8,9,10,11,12,13]),
 
 % normalize sense map to reasonable value range
 sense_map = sense_map*4095/max(sense_map(:));
+
+% shift image in phase-encoding direction if needed
+if isfield(parameters,'pixelshift1')
+    image_out = circshift(image_out,parameters.pixelshift1,2);
+end
+
 
 end

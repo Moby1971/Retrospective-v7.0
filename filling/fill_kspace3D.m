@@ -1,4 +1,4 @@
-function [kspace,averages]=fill_kspace3D(raw,includewindow,nr_of_card_frames,nr_of_resp_frames,nr_dynamics,dimz,dimy,nr_ksteps,dimx,card_bin_ass,resp_bin_ass,traj,centric)
+function [kspace,averages]=fill_kspace3D(raw,includewindow,nr_of_card_frames,nr_of_resp_frames,nr_dynamics,dimz,dimy,nr_ksteps,dimx,card_bin_ass,resp_bin_ass,traj,par)
 
 % This function creates 2 arrays
 % (1) the 3D kspace data sorted into the correct cardiac frames and phase-encoding positions
@@ -27,9 +27,11 @@ nr_reps = size(raw,1);                                                         %
 unsorted_kspace = reshape(raw,[1,size(raw),1]);
 
 
+
 % dynamics assignment
 totalk = nr_reps * nr_ksteps * dimz;
 dyn_bin_ass = round(linspace(0.5, nr_dynamics+0.49, totalk));       % list of increasing integer number 1 .. nr_dynamics evenly spaced over the entire acquistion time
+
 
 
 % adapt trajectory for 3D acqusition
@@ -45,32 +47,54 @@ for i = 1:nr_reps
     end
 end
 
-    
+
+
 % the z-dimension
-if centric == 0
-    % linear in the 3rd dimension
-    cnt = 1;
-    for i = 1:nr_reps
-        for j = 1:nr_ksteps
-            for k = 1:dimz
-                traj3D_z(cnt) = k;  % linear
-                cnt = cnt + 1;
+
+switch par.pe2_centric_on
+    
+    case 0
+        
+        % linear in the 3rd dimension
+        cnt = 1;
+        for i = 1:nr_reps
+            for j = 1:nr_ksteps
+                for k = 1:dimz
+                    traj3D_z(cnt) = k;  % linear
+                    cnt = cnt + 1;
+                end
             end
         end
-    end
-else
-    % centric in the 3rd dimension
-    cnt = 1;
-    cf = centricfilling(dimz);
-    for i = 1:nr_reps
-        for j = 1:nr_ksteps
-            for k = 1:dimz
-                traj3D_z(cnt) = cf(k);  % centric
-                cnt = cnt + 1;
+        
+    case 1
+        
+        % centric in the 3rd dimension
+        cnt = 1;
+        cf = centricfilling(dimz);
+        for i = 1:nr_reps
+            for j = 1:nr_ksteps
+                for k = 1:dimz
+                    traj3D_z(cnt) = cf(k);  % centric
+                    cnt = cnt + 1;
+                end
             end
         end
-    end
+        
+    case 2
+        
+        % special case
+        cnt = 1;
+        for i = 1:nr_reps
+            for j = 1:nr_ksteps
+                for k = 1:dimz
+                    traj3D_z(cnt) = par.pe2_traj(k) + round(dimz/2) + 1;
+                    cnt = cnt + 1;
+                end
+            end
+        end
+
 end
+
 
 
 % Do the filling of k-space
@@ -105,6 +129,7 @@ kspace = kspace./averages;              % normalize by number of averages
 
 kspace(isnan(kspace)) = complex(0);     % correct for NaN because of division by zero in case of missing k-lines
 kspace(isinf(kspace)) = complex(0);
+
 
 
 % Apply a circular Tukey filter

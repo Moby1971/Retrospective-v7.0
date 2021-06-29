@@ -1,4 +1,4 @@
-function image_out = cs_reco2D_mat_mc(app,kspace_in,nc,averages,lambda_TV)
+function image_out = cs_reco2D_mat_mc(app,kspace_in,nc,averages,lambda_TV,parameters)
 
 
 % kdata_in = {coil}[CINE, y, x, slice, dynamic]
@@ -116,6 +116,12 @@ end
 % correct back to 1 frame reconstruction
 if nr_cine == 1
    image_out = image_out(1,:,:,:,:);
+end
+
+
+% shift image in phase-encoding direction if needed
+if isfield(parameters,'pixelshift1')
+    image_out = circshift(image_out,parameters.pixelshift1,2);
 end
 
 

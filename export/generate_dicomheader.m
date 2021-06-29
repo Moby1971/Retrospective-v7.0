@@ -15,8 +15,11 @@ function dicom_header = generate_dicomheader(parameters,slice,dyn,nr_dynamics,fr
 %
 %
 
-studyname = str2num(parameters.filename(end-9:end-6));
-
+try
+    studyname = str2num(parameters.filename(end-9:end-6));
+catch
+    studyname = 1111;
+end
 
 
 if strcmp(recotype,'realtime')
