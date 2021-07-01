@@ -111,7 +111,7 @@ if ESPIRiT && nc>1
     
 else
     
-    % Reconstruction without sensitivity correction
+    % Reconstruction without sensitivity correction, including coil scaling
     sensitivities = ones(1,dimy,dimx,nc,1,1,1,1,1,1,1,1,1,dimz);
     
     % regular reconstruction

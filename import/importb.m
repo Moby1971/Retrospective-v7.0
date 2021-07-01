@@ -2,10 +2,10 @@ function [rawdata,parameters] = importb(import_path)
 
 
 % test data
-%import_path = '/Users/gustav/Dropbox/Reconstruction_and_analysis_tools/Matlab/MRI-apps example data/Retrospective/Bruker data/VolumeResonator_PV_6.0.1/short_axis/22_short_scan/';
-%import_path = '/Users/gustav/Dropbox/Reconstruction_and_analysis_tools/Matlab/MRI-apps example data/Retrospective/Bruker data/4channel_cardio_PV_6.0.1/short_axis/22_long_scan/';
+% import_path = '/Users/gustav/Dropbox/Reconstruction_and_analysis_tools/Matlab/MRI-apps example data/Retrospective/Bruker data/VolumeResonator_PV_6.0.1/short_axis/22_short_scan/';
+% import_path = '/Users/gustav/Dropbox/Reconstruction_and_analysis_tools/Matlab/MRI-apps example data/Retrospective/Bruker data/4channel_cardio_PV_6.0.1/short_axis/22_long_scan/';
 %import_path = '/Users/gustav/Dropbox/Reconstruction_and_analysis_tools/Matlab/MRI-apps example data/Retrospective/Bruker data/VolumeResonator_PV_5.0/short_axis_sperate_slice_nav/7/';
-
+%import_path = '/Users/gustav/Dropbox/Reconstruction_and_analysis_tools/Matlab/MRI-apps example data/Retrospective/Bruker data/4channel_cardio_PV_6.0.1/long_axis/4/';
 
 % Parameters
 info1 = jcampread(strcat(import_path,'acqp'));
@@ -101,10 +101,18 @@ parameters.no_coils = str2num(info2.pvm.encnreceivers);
 
 % Trajectory 1st phase encoding direction
 if isfield(info2.pvm,'ppggradamparray1')
-    parameters.gp_var_mul = round(-info2.pvm.ppggradamparray1 * (parameters.NO_VIEWS/2-0.5));
+    if isfield(info2.pvm,'enczfaccel1') && isfield(info2.pvm,'encpftaccel1')
+        parameters.gp_var_mul = round(-info2.pvm.ppggradamparray1 * str2num(info2.pvm.enczfaccel1) * str2num(info2.pvm.encpftaccel1) * (parameters.NO_VIEWS/2-0.5));
+    else
+        parameters.gp_var_mul = round(-info2.pvm.ppggradamparray1 * (parameters.NO_VIEWS/2-0.5));
+    end
     parameters.pe1_order = 3;
 elseif isfield(info2.pvm,'encvalues1')
-    parameters.gp_var_mul = round(-info2.pvm.encvalues1 * (parameters.NO_VIEWS/2-0.5));
+    if isfield(info2.pvm,'enczf') && isfield(info2.pvm,'encpft')
+        parameters.gp_var_mul = round(-info2.pvm.encvalues1 * info2.pvm.enczf(2) * info2.pvm.encpft(2) * (parameters.NO_VIEWS/2-0.5));
+    else
+        parameters.gp_var_mul = round(-info2.pvm.encvalues1 * (parameters.NO_VIEWS/2-0.5));
+    end
     parameters.pe1_order = 3;
 else
     % assume zigzag
@@ -164,6 +172,13 @@ if strcmp(info2.pvm.spatdimenum,"2D") || strcmp(info2.pvm.spatdimenum,"<2D>")
     
     kspace = reshape(kspace,parameters.NO_SLICES,parameters.NO_SAMPLES,parameters.no_coils,parameters.NO_VIEWS,parameters.EXPERIMENT_ARRAY);
     kspace = permute(kspace,[3,5,1,4,2]); % nc, nr, ns, np, nf
+   
+    % coil intensity scaling
+    if isfield(info2.pvm,'encchanscaling')
+        for i = 1:parameters.no_coils
+            kspace(i,:) = kspace(i,:)*info2.pvm.encchanscaling(i);
+        end
+    end
     
     navkspace = reshape(navkspace,parameters.NO_SLICES,parameters.no_samples_nav,parameters.no_coils,parameters.NO_VIEWS,parameters.EXPERIMENT_ARRAY);
     navkspace = permute(navkspace,[3,5,1,4,2]);
@@ -206,6 +221,13 @@ if strcmp(info2.pvm.spatdimenum,"3D") || strcmp(info2.pvm.spatdimenum,"<3D>")
     
     kspace = reshape(kspace,parameters.no_coils,parameters.NO_SAMPLES,parameters.NO_VIEWS,parameters.NO_VIEWS_2,parameters.EXPERIMENT_ARRAY);
     kspace = permute(kspace,[1,5,4,3,2]);
+    
+    % coil intesnity scaling
+    if isfield(info2.pvm,'encchanscaling')
+        for i = 1:parameters.no_coils
+            kspace(i,:) = kspace(i,:)*info2.pvm.encchanscaling(i);
+        end
+    end
     
     navkspace = reshape(navkspace,parameters.no_coils,parameters.no_samples_nav,parameters.NO_VIEWS,parameters.NO_VIEWS_2,parameters.EXPERIMENT_ARRAY);
     navkspace = permute(navkspace,[1,5,4,3,2]);
