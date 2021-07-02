@@ -56,8 +56,10 @@ if fid~=-1
                     % Read the next line
                     nextline = fgetl(fid);
                     % See whether next line contains a character array
-                    if nextline(1) == '<'
+                    if nextline(1) == '<' 
                         paramvalue = fliplr(strtok(fliplr(strtok(nextline,'>')),'<'));
+                    elseif strcmp(nextline(1),'L') || strcmp(nextline(1),'A') || strcmp(nextline(1),'H')
+                        paramvalue = nextline;
                     else
                         % Check if matrix has more then one dimension
                         if paramvaluesize(2) ~= 1
