@@ -1,4 +1,4 @@
-function [image_out,sense_map] = cs_reco2D_mc(app,kspace_in,nc,Wavelet,TVxy,LR,TVt,TVd,ESPIRiT,CLEAR,SOS,parameters)
+function [image_out,sense_map] = cs_reco2D_mc(app,kspace_in,nc,Wavelet,TVxy,LR,TVt,TVd,ESPIRiT,SOS,parameters)
 
 % app = matlab app
 % kspace_in = sorted k-space 
@@ -92,22 +92,11 @@ if ESPIRiT && nc>1
     image_reg = bart(picscommand,kspace_pics,sensitivities);
     
     % Sum of squares reconstruction
-    if SOS==1
+    if SOS == 1
         image_reg = bart('rss 16', image_reg);
+        
     end
     image_reg = abs(image_reg);
-    
-    % CLEAR intensity correction
-    if CLEAR
-        TextMessage(app,'CLEAR correction ...');
-        clear_map = sqrt(sum(abs(sensitivities).^2,[4,5]));         % sum of squares sensitivity maps
-        data_dims = size(image_reg);                                % size of the bart reconstructed images
-        clear_map = repmat(clear_map,[1 1 1 data_dims(4:end)]);     % adjust size of sensitivity maps to size of images
-        clear_map(clear_map<0.2) = 0;                               % threshold to avoid division by very low values
-        image_reg = image_reg./clear_map;                           % clear corrected image
-        image_reg(isnan(image_reg)) = 0;                            % correct for division by zero
-        image_reg(isinf(image_reg)) = 0;                            % correct for division by zero
-    end
     
 else
     
@@ -139,17 +128,8 @@ else
 end
 
 % rearrange to correct orientation: frames, x, y, slices, dynamics, coils
-if SOS==1
-    
-    image_reg = reshape(image_reg,[dimy,dimx,dimc,dimd,dimz]);
-    image_out = flip(permute(image_reg,[3,2,1,5,4]),3);
-    
-else
-    
-    image_reg = reshape(image_reg,[dimy,dimx,dimc,nc,dimd,dimz]);
-    image_out = flip(permute(image_reg,[3,2,1,6,5,4]),3);
-    
-end
+image_reg = reshape(image_reg,[dimy,dimx,dimc,dimd,dimz]);
+image_out = flip(permute(image_reg,[3,2,1,5,4]),3);
 
 % sense map orientations: x, y, slice, map1, map2
 sense_map = flip(permute(abs(sensitivities),[3,2,14,4,5,1,6,7,8,9,10,11,12,13]),2);

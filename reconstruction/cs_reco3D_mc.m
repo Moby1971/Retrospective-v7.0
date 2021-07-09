@@ -1,4 +1,4 @@
-function [image_out,sense_map] = cs_reco3D_mc(app,kspace_in,nc,Wavelet,TVxyz,LR,TVt,TVd,ESPIRiT,CLEAR)
+function [image_out,sense_map] = cs_reco3D_mc(app,kspace_in,nc,Wavelet,TVxyz,LR,TVt,TVd,ESPIRiT)
 
 % app = matlab app
 % kspace_in = sorted k-space
@@ -106,23 +106,11 @@ if ESPIRiT && nc>1
     image_reg = bart('rss 16', image_reg);
     image_reg = abs(image_reg);
     
-    % CLEAR intensity correction
-    if CLEAR
-        TextMessage(app,'CLEAR correction ...');
-        clear_map = sqrt(sum(abs(sensitivities).^2,[4,5]));         % sum of squares sensitivity maps
-        data_dims = size(image_reg);                                % size of the bart reconstructed images
-        clear_map = repmat(clear_map,[1 1 1 data_dims(4:end)]);     % adjust size of sensitivity maps to size of images
-        clear_map(clear_map<0.5) = 0;                               % threshold to avoid division by very low values
-        image_reg = image_reg./clear_map;                           % clear corrected image
-        image_reg(isnan(image_reg)) = 0;                            % correct for division by zero
-        image_reg(isinf(image_reg)) = 0;                            % correct for division by zero
-    end
-    
 else
     
     % Reconstruction without sensitivity correction
     sensitivities = ones(dimz,dimy,dimx,nc,1,1,1,1,1,1,1,1,1,1);
-    
+  
     picscommand = 'pics -S ';
     if Wavelet>0
        picscommand = [picscommand,' -RW:7:0:',num2str(Wavelet)];

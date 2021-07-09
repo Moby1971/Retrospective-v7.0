@@ -1,4 +1,4 @@
-function output = circtukey3D(dimz,dimy,dimx,filterwidth)
+function output = circtukey3D(dimz,dimy,dimx,lev,row,col,filterwidth)
 
 % 3D Tukey filter
 
@@ -9,9 +9,13 @@ base = zeros(domain,domain,domain);
 tukey1 = tukeywin(domain,filterwidth);
 tukey1 = tukey1(domain/2+1:domain);
 
-x = linspace(-domain/2, domain/2, domain);
-y = linspace(-domain/2, domain/2, domain);
+shiftz = (lev-dimz/2)*domain/dimz;
+shifty = (row-dimy/2)*domain/dimy;
+shiftx = (col-dimx/2)*domain/dimx;
+
 z = linspace(-domain/2, domain/2, domain);
+y = linspace(-domain/2, domain/2, domain);
+x = linspace(-domain/2, domain/2, domain);
 
 for i=1:domain
 
@@ -19,9 +23,11 @@ for i=1:domain
     
         for k = 1:domain
         
-            if (round(sqrt(x(i)^2 + y(j)^2 + z(k)^2)) <= domain/2)
+            rad = round(sqrt((shiftx-x(i))^2 + (shifty-y(j))^2 + (shiftz-z(k))^2));
+            
+            if (rad <= domain/2) && (rad > 0)
                 
-              base(i,j,k) = tukey1(round(sqrt(x(i)^2 + y(j)^2 + z(k)^2)));
+              base(k,j,i) = tukey1(rad);
               
             end
             
@@ -32,5 +38,6 @@ for i=1:domain
 end
 
 output = imresize3(base,[dimz dimy dimx]);
+
 
 end
