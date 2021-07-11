@@ -163,8 +163,22 @@ if (share > 0) && (nr_of_card_frames > 1 || nr_of_resp_frames > 1)
     Rx = round(dimx/share/2);
     [Z,Y,X] = ndgrid(1:dimz,1:dimy,1:dimx);
     for i = 1:share
-        L(share - i + 1,:,:,:) = sqrt( ((lev-Z)/(Rz*i)).^2 + ((row-Y)/(Ry*i)).^2 + ((col-X)/(Rx*i)).^2 ) <= 1;
+        L(i,:,:,:) = sqrt( ((lev-Z)/(Rz*i)).^2 + ((row-Y)/(Ry*i)).^2 + ((col-X)/(Rx*i)).^2 ) <= 1;
     end
+    C(1,:,:,:) = L(1,:,:,:);
+    if share > 1
+        for i = 2:share
+            C(i,:,:,:) = L(i,:,:,:) - L(i-1,:,:,:);
+        end
+    end
+    
+    % weights
+    for i = 1:share
+        for j = 1:share
+            weights(i,j) = gauss(i+j-1,share,0);
+        end
+    end
+    weights = 0.5*weights/max(weights(:));
     
     % apply sharing to k-space
     for frame = 1:nrframes
@@ -177,9 +191,13 @@ if (share > 0) && (nr_of_card_frames > 1 || nr_of_resp_frames > 1)
             
             if i~=0
                 
-                ROI = reshape(squeeze(L(abs(i),:)),[1 1 dimz dimy dimx 1])*weights(abs(i));
-                new_kspace(:,frame,:,:,:,:)   = new_kspace(:,frame,:,:,:,:)   + sorted_kspace(:,sharedframe,:,:,:,:)   .* ROI;
-                new_averages(:,frame,:,:,:,:) = new_averages(:,frame,:,:,:,:) + sorted_averages(:,sharedframe,:,:,:,:) .* ROI;
+                for j = 1:share
+                    
+                    ROI = reshape(squeeze(C(j,:,:,:)),[1 1 dimz dimy dimx 1])*weights(j,abs(i));
+                    new_kspace(:,frame,:,:,:,:)   = new_kspace(:,frame,:,:,:,:)   + sorted_kspace(:,sharedframe,:,:,:,:)   .* ROI;
+                    new_averages(:,frame,:,:,:,:) = new_averages(:,frame,:,:,:,:) + sorted_averages(:,sharedframe,:,:,:,:) .* ROI;
+                    
+                end
                 
             end
             
